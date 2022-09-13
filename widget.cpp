@@ -1,8 +1,9 @@
 #include "widget.h"
 #include "ui_widget.h"
 
-#include <QFile>
+//#include <QFile>
 //#include <qsettings.h>
+
 
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
@@ -19,9 +20,12 @@ Widget::Widget(QWidget *parent)
     ui->label_3->setVisible(false);
 
     ui->IPlineEdit->setPlaceholderText("xxx.xxx.xxx.xxx");
-    ui->PortlineEdit->setPlaceholderText("1 ~ 65525");
+    ui->PortlineEdit->setPlaceholderText("xxxxx");
     ui->command->setPlaceholderText("Enter some commands...");
     ui->img_2->setPixmap(QPixmap(":/pic/res/img.png"));
+    ui->draw->setIcon(QIcon(":/pic/res/pen.png"));
+    ui->clear->setIcon(QIcon(":/pic/res/Eraser.png"));
+    ui->pushButton->setIcon(QIcon(":/pic/res/send.png"));
 
 }
 
@@ -159,6 +163,7 @@ void Widget::on_pushButton_clicked()
 
 void Widget::on_draw_clicked()
 {
+    ui->command->clear();
     ui->img_2->drawLine();
 
     std::vector<QPointF> point = ui->img_2->getPoints();
@@ -180,4 +185,16 @@ void Widget::on_clear_clicked()
 }
 
 
+
+
+void Widget::on_pushButton_2_clicked()
+{
+    ui->sendText->clear();
+}
+
+
+void Widget::on_pushButton_3_clicked()
+{
+    ui->receiveText->clear();
+}
 

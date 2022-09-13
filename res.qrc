@@ -2,5 +2,8 @@
     <qresource prefix="/pic">
         <file>res/img.png</file>
         <file>res/logo.png</file>
+        <file>res/pen.png</file>
+        <file>res/Eraser.png</file>
+        <file>res/send.png</file>
     </qresource>
 </RCC>
