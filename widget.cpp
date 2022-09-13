@@ -1,13 +1,16 @@
 #include "widget.h"
 #include "ui_widget.h"
 
-#include <qsettings.h>
+#include <QFile>
+//#include <qsettings.h>
 
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::Widget)
 {
     ui->setupUi(this);
+
+    this->setWindowFlags(windowFlags()& ~Qt::WindowMaximizeButtonHint);
 
     ui->LinkButton->setFlat(true);
     ui->sendText->setReadOnly(true);
@@ -17,6 +20,7 @@ Widget::Widget(QWidget *parent)
     ui->IPlineEdit->setPlaceholderText("xxx.xxx.xxx.xxx");
     ui->PortlineEdit->setPlaceholderText("1 - 65525");
     ui->command->setPlaceholderText("Enter some commands...");
+    ui->img_2->setPixmap(QPixmap(":/pic/res/img.png"));
 }
 
 Widget::~Widget()
@@ -24,24 +28,9 @@ Widget::~Widget()
     delete ui;
 }
 
-
+/*以tcp-server的方式连接*/
 void Widget::on_LinkButton_clicked()
 {
-//    QSettings wallPaper("HKEY_CURRENT_USER\\Control Panel\\Desktop",
-//                           QSettings::NativeFormat);
-
-//        //新的桌面图片路径
-//        QString path("C:/Users/ligoh/Pictures/Camera Roll/WIN_20220201_19_51_22_Pro.jpg");
-
-//        //给壁纸注册表设置新的值（新的图片路径）
-//        wallPaper.setValue("Wallpaper",path);
-//        QByteArray byte = path.toLocal8Bit();
-
-//        //调用windowsAPI
-//        SystemParametersInfoA(SPI_SETDESKWALLPAPER, 0, byte.data(), SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
-
-//    GetSystemTime(&time);
-//    qDebug()<< time.wHour + 8 << ":" << time.wMinute <<time.wSecond;
 
     m_ip = ui->IPlineEdit->text();
     m_port = ui->PortlineEdit->text();
@@ -53,7 +42,6 @@ void Widget::on_LinkButton_clicked()
         ui->label_3->setVisible(true);
         return;
     }
-    qDebug()<<"ok, fine.";
 
     ui->label_3->setText("Connect...");
     ui->label_3->setStyleSheet("#label_3{color:blue}");
@@ -86,9 +74,9 @@ void Widget::on_LinkButton_clicked()
         m_addr.sin_port = ::htons(m_port.toUShort()); //设置port
 
         //与服务器连接
-        iResutlt = ::connect(m_socket, (sockaddr*)&m_addr, sizeof(struct sockaddr_in));
+        iResult = ::connect(m_socket, (sockaddr*)&m_addr, sizeof(struct sockaddr_in));
 
-        if(iResutlt == SOCKET_ERROR)
+        if(iResult == SOCKET_ERROR)
         {
             ui->label_3->setText("Connection Failed !");
             ui->label_3->setStyleSheet("#label_3{color:red}");
@@ -100,12 +88,72 @@ void Widget::on_LinkButton_clicked()
             ui->label_3->setText("Connected.");
             ui->label_3->setStyleSheet("#label_3{color:green}");
             ui->label_3->setVisible(true);
-
             ui->LinkButton->setEnabled(false);
+
+            m_thread = new QThread;
+            check = new m_connection(nullptr, m_socket);
+
+            connect(check,&m_connection::_disconnect,this,&Widget::disconnection);
+            connect(this,&Widget::_run,check,&m_connection::run);
+            connect(check,&m_connection::sendByteArray,this,&Widget::byteArrayProcess);
+
+            check->moveToThread(m_thread);
+//            check->run();
+
+            emit _run();
+
+            //启动线程
+            m_thread->start();
         }
+    }
+}
+
+void Widget::disconnection()
+{
+    ui->LinkButton->setEnabled(true);
+    ui->label_3->setText("Disconnected !");
+    ui->label_3->setStyleSheet("#label_3{color:red}");
+    ui->label_3->setVisible(true);
+
+    m_thread->exit();
+    delete check;
+    m_thread->deleteLater();
+}
+
+/*处理接收字节*/
+void Widget::byteArrayProcess(QByteArray ba)
+{
+    QString ss = QString::fromLatin1(ba.data(), ba.size());
+
+    QByteArray rc = QByteArray::fromHex(ss.toLatin1());
+    QByteArray rdc = qUncompress(rc); //解压
+
+    QImage img;
+    img.loadFromData(rdc);
+
+    ui->img_2->setPixmap(QPixmap::fromImage(img));
+    ui->img_2->resize(img.width(),img.height());
+    ui->img->resize(img.width(),img.height());
+    ui->receiveText->append(ss);
+    qDebug()<<ui->img_2->width()<<ui->img->width()<<ui->img->height();
+}
+
+/*发送命令*/
+void Widget::on_pushButton_clicked()
+{
+    char* c = ui->command->toPlainText().toLatin1().data();
+    iSendResult = send(m_socket, c, (int)strlen(c), 0);
+
+    ui->sendText->append(ui->command->toPlainText());
+    if(iSendResult != SOCKET_ERROR)
+    {
+        ui->command->clear();
+        ui->sendText->append("Send successfully!");
+    }
+    else
+    {
+        ui->sendText->append("Error occurred when sending the command!");
 
     }
-
-
 }
 

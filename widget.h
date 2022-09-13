@@ -1,11 +1,13 @@
 #ifndef WIDGET_H
 #define WIDGET_H
 
-#include "windows.h"
+//#include "windows.h"
+#include "m_connection.h"
 #include <WinSock2.h>
 #include <QWidget>
 #include <QDebug>
 #include <QMessageBox>
+#include <QThread>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Widget; }
@@ -19,8 +21,16 @@ public:
     Widget(QWidget *parent = nullptr);
     ~Widget();
 
-private slots:
+signals:
+    void _run();
+
+public slots:
     void on_LinkButton_clicked();
+    void disconnection();
+    void byteArrayProcess(QByteArray ba);
+
+private slots:
+    void on_pushButton_clicked();
 
 private:
     Ui::Widget *ui;
@@ -30,8 +40,12 @@ private:
     SOCKET m_socket;  //socket结构体
     QString m_ip;
     QString m_port;
+    QTimer* timer;
+    QThread* m_thread;
+    m_connection* check;
 
-    int iResutlt = 0;
+    int iResult = 0;
+    int iSendResult = 0;
 
 };
 #endif // WIDGET_H
