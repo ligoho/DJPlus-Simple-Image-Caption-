@@ -13,3 +13,4 @@ tips：仅支持**zlib**压缩的图片。
 ***
 
 学习交流用途
+![](https://i.imgur.com/k1ybpHP.mp4)
