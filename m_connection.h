@@ -3,7 +3,6 @@
 
 //#include "windows.h"
 #include <WinSock2.h>
-#include <QDebug>
 #include <QObject>
 #include <QTimer>
 

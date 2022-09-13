@@ -10,6 +10,7 @@ Widget::Widget(QWidget *parent)
 {
     ui->setupUi(this);
 
+    this->setWindowIcon(QIcon(":/pic/res/logo.png"));
     this->setWindowFlags(windowFlags()& ~Qt::WindowMaximizeButtonHint);
 
     ui->LinkButton->setFlat(true);
@@ -18,9 +19,10 @@ Widget::Widget(QWidget *parent)
     ui->label_3->setVisible(false);
 
     ui->IPlineEdit->setPlaceholderText("xxx.xxx.xxx.xxx");
-    ui->PortlineEdit->setPlaceholderText("1 - 65525");
+    ui->PortlineEdit->setPlaceholderText("1 ~ 65525");
     ui->command->setPlaceholderText("Enter some commands...");
     ui->img_2->setPixmap(QPixmap(":/pic/res/img.png"));
+
 }
 
 Widget::~Widget()
@@ -133,9 +135,7 @@ void Widget::byteArrayProcess(QByteArray ba)
 
     ui->img_2->setPixmap(QPixmap::fromImage(img));
     ui->img_2->resize(img.width(),img.height());
-    ui->img->resize(img.width(),img.height());
     ui->receiveText->append(ss);
-    qDebug()<<ui->img_2->width()<<ui->img->width()<<ui->img->height();
 }
 
 /*发送命令*/
@@ -153,7 +153,31 @@ void Widget::on_pushButton_clicked()
     else
     {
         ui->sendText->append("Error occurred when sending the command!");
-
     }
 }
+
+
+void Widget::on_draw_clicked()
+{
+    ui->img_2->drawLine();
+
+    std::vector<QPointF> point = ui->img_2->getPoints();
+
+    int size = static_cast<int>(point.size());
+    for(int i=0; i<size; ++i)
+    {
+        QString s = "(X:" + QString::number((int)point[i].x()) + ", Y:" + QString::number((int)point[i].y()) + ")";
+        ui->command->append(s);
+    }
+}
+
+
+void Widget::on_clear_clicked()
+{
+    ui->img_2->clearLine();
+
+    ui->command->clear();
+}
+
+
 

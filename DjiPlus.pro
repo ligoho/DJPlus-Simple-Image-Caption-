@@ -12,11 +12,13 @@ CONFIG += c++17
 
 SOURCES += \
     m_connection.cpp \
+    m_label.cpp \
     main.cpp \
     widget.cpp
 
 HEADERS += \
     m_connection.h \
+    m_label.h \
     widget.h
 
 FORMS += \
@@ -29,3 +31,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += \
     res.qrc
+
+RC_ICONS = res/logo.ico

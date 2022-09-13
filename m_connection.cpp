@@ -17,12 +17,12 @@ void m_connection::check_Connection()
 
         if (iResult > 0)
         {
-            qDebug()<< "Bytes received: " + QString::number(iResult);
+            //接收成功
             emit sendByteArray(QByteArray(recvbuf));
         }
         else if (iResult == 0)
         {
-            qDebug()<< "断开连接";
+            //断开连接
             timer->stop();
             delete timer;
 
@@ -30,7 +30,7 @@ void m_connection::check_Connection()
         }
         else
         {
-            qDebug() << "recv failed: %d\n";
+            //接受失败
         }
 }
 

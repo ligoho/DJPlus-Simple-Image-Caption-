@@ -3,9 +3,9 @@
 
 //#include "windows.h"
 #include "m_connection.h"
+#include "m_label.h"
 #include <WinSock2.h>
 #include <QWidget>
-#include <QDebug>
 #include <QMessageBox>
 #include <QThread>
 
@@ -23,6 +23,8 @@ public:
 
 signals:
     void _run();
+    void _draw();
+    void _clear();
 
 public slots:
     void on_LinkButton_clicked();
@@ -31,6 +33,8 @@ public slots:
 
 private slots:
     void on_pushButton_clicked();
+    void on_draw_clicked();
+    void on_clear_clicked();
 
 private:
     Ui::Widget *ui;
